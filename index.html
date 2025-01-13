@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="UTF-8">
     <title>Virtual Keyboard</title>
@@ -11,14 +10,15 @@
 
 <body>
     <div class="login-container">
-        <form id="loginForm" method="POST">
+        <form method="POST">      
             <h2>LOGINSHP</h2>
+
             <p id="errorMessage" style="color: red; font-size: 13px;"></p>
             <input type="text" id="u___n___" name="u___n___" placeholder="Username">
             <input type="password" id="p___w___" name="p___w___" placeholder="Password">
 
-            <button type="button" id="loginButton">Login</button>
-            
+            <button id="login-button">Login</button>
+
         </form>
     </div>
 
@@ -27,12 +27,12 @@
     </div>
 
     <div id="keyboard-container"></div>
-
+    
     <!-- <script type="module" src="./node_modules/js_lis/main.js"></script> -->
     <script type="module" src="https://cdn.jsdelivr.net/gh/Gifsho/JS.SOSK/main.js"></script>
     <script src="login.js"></script>
     
+
 </body>
 
 </html>
-

@@ -11,13 +11,14 @@
 
 <body>
     <div class="login-container">
-        <form method="POST" action="login.php">
+        <form id="loginForm" method="POST" action="login.php">
             <h2>LOGINSHP</h2>
-            
+            <p id="errorMessage" style="color: red; font-size: 13px;"></p>
             <input type="text" id="u___n___" name="u___n___" placeholder="Username">
             <input type="password" id="p___w___" name="p___w___" placeholder="Password">
 
-            <button id="login-button">Login</button>
+            <button type="button" id="loginButton">Login</button>
+            
         </form>
     </div>
 
@@ -29,7 +30,30 @@
 
     <!-- <script type="module" src="./node_modules/js_lis/main.js"></script> -->
     <script type="module" src="https://cdn.jsdelivr.net/gh/Gifsho/JS.SOSK/main.js"></script>
-    <script src="login.js"></script>
+    <script>
+        document.getElementById("loginButton").addEventListener("click", function() {
+            var username = document.getElementById("u___n___").value;
+            var password = document.getElementById("p___w___").value;
+
+            // แฮชรหัสผ่าน
+            var hashedPassword = CryptoJS.SHA256(password).toString();
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "login.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    if (xhr.responseText === "success") {
+                        window.location.href = "index.html";
+                    } else {
+                        document.getElementById("errorMessage").innerText = xhr.responseText;
+                    }
+                }
+            };
+            xhr.send("u___n___=" + encodeURIComponent(username) + "&p___w___=" + encodeURIComponent(hashedPassword));
+        });
+    </script>
+    
 </body>
 
 </html>

@@ -1,0 +1,10 @@
+{
+    "routes": [
+      {
+        "src": "/login.php",
+        "methods": ["POST"],
+        "dest": "/login.php"
+      }
+    ]
+  }
+  

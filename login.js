@@ -1,12 +1,28 @@
-const encryptionKey = CryptoJS.enc.Utf8.parse("1234567890123456");
-const iv = CryptoJS.enc.Utf8.parse("1234567890123456");
+const predefinedUsername = "test"; // ชื่อผู้ใช้ที่ตั้งไว้
+const predefinedPassword = "1234"; // รหัสผ่านที่ตั้งไว้
 
-function encryptText(text) {
-  return CryptoJS.AES.encrypt(text, encryptionKey, {
+function generateRandomKey() {
+  return CryptoJS.lib.WordArray.random(16); // สุ่มคีย์ 128 บิต
+}
+
+function encryptText(text, key, iv) {
+  const encrypted = CryptoJS.AES.encrypt(text, key, {
     iv: iv,
     mode: CryptoJS.mode.CBC,
     padding: CryptoJS.pad.Pkcs7
-  }).toString();
+  });
+
+  return encrypted.toString();
+}
+
+function decryptText(encryptedText, key, iv) {
+  const bytes = CryptoJS.AES.decrypt(encryptedText, key, {
+    iv: iv,
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7
+  });
+
+  return bytes.toString(CryptoJS.enc.Utf8);
 }
 
 async function login(event) {
@@ -15,37 +31,23 @@ async function login(event) {
   const Username = document.getElementById("u___n___").value;
   const Password = document.getElementById("p___w___").value;
 
-  const encryptedUsername = encryptText(Username);
-  const encryptedPassword = encryptText(Password);
+  // สุ่มคีย์และ IV ใหม่สำหรับแต่ละการเข้ารหัส
+  const encryptionKey = generateRandomKey();
+  const iv = CryptoJS.lib.WordArray.random(16);
 
-  const loginData = {
-    u___n___: encryptedUsername,
-    p___w___: encryptedPassword,
-  };
+  const encryptedUsername = encryptText(Username, encryptionKey, iv);
+  const encryptedPassword = encryptText(Password, encryptionKey, iv);
 
-  try {
-    const response = await fetch('https://logintest-gxrh.onrender.com/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(loginData),
-    });
+  // การถอดรหัสเพื่อตรวจสอบค่าที่ป้อน
+  const decryptedUsername = decryptText(encryptedUsername, encryptionKey, iv);
+  const decryptedPassword = decryptText(encryptedPassword, encryptionKey, iv);
 
-    const data = await response.json();
-
-    if (data.token) {
-      alert("เข้าสู่ระบบสำเร็จ");
-      localStorage.setItem("token", data.token);
-      location.reload();
-      console.log(loginData);
-    } else {
-      alert(data.message || "เกิดข้อผิดพลาด");
-      location.reload();
-    }
-  } catch (error) {
-    alert("เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์");
-    console.error("Error:", error);
+  if (decryptedUsername === predefinedUsername && decryptedPassword === predefinedPassword) {
+    alert("เข้าสู่ระบบสำเร็จ");
+    localStorage.setItem("token", "fake-token"); // ใช้ token ปลอมในกรณีนี้
+    location.reload();
+  } else {
+    alert("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
   }
 }
 

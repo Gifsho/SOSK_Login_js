@@ -38,13 +38,23 @@ async function login(event) {
   const encryptedUsername = encryptText(Username, encryptionKey, iv);
   const encryptedPassword = encryptText(Password, encryptionKey, iv);
 
-  // การถอดรหัสเพื่อตรวจสอบค่าที่ป้อน
-  const decryptedUsername = decryptText(encryptedUsername, encryptionKey, iv);
-  const decryptedPassword = decryptText(encryptedPassword, encryptionKey, iv);
+  // ส่งคำขอไปยัง API
+  const response = await fetch('https://logintest-gxrh.onrender.com/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      username: encryptedUsername,
+      password: encryptedPassword
+    })
+  });
 
-  if (decryptedUsername === predefinedUsername && decryptedPassword === predefinedPassword) {
+  const result = await response.json();
+
+  if (result.success) {
     alert("เข้าสู่ระบบสำเร็จ");
-    localStorage.setItem("token", "fake-token"); // ใช้ token ปลอมในกรณีนี้
+    localStorage.setItem("token", result.token); // ใช้ token ที่ได้รับจาก API
     location.reload();
   } else {
     alert("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
